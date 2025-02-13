@@ -1,0 +1,47 @@
+{
+  "name": "@like_kk/bridge-core",
+  "version": "1.0.4",
+  "description": "",
+  "main": "dist/bundle.cjs.js",
+  "module": "dist/bundle.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "rollup -c rollup.config.ts --configPlugin typescript",
+    "build": "rollup -c rollup.config.ts --configPlugin typescript && tsc --emitDeclarationOnly",
+    "test": "jest --coverage",
+    "docs": "typedoc --out docs src",
+    "prepublish": "npm run build && npm test",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "rollup": "^4.34.6",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.27.7",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@vueuse/core": "^12.5.0",
+    "crypto-js": "^4.2.0",
+    "use-element-plus-theme": "^0.0.5"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/bundle.esm.js",
+      "require": "./dist/bundle.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}

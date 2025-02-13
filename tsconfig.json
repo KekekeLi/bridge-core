@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,       // 添加这行
+    "declarationDir": "./dist", // 添加这行
+    "types": [],
+    "typeRoots": ["./node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "lib": [
+      "es2017",
+      "dom",
+      "es2015.collection",
+      "es2015.iterable"
+    ]
+  },
+  "include": ["src", "src/**/*", "src/**/*.ts", "src/**/*.d.ts", "src/roullup.config.ts"],
+  "exclude": ["node_modules"]
+}

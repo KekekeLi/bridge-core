@@ -41,7 +41,6 @@ declare module '@like_kk/bridge-core' {
     // ==================== 主题模块类型 ====================
     export interface ThemeConfig {
       primary: string;
-      secondary: string;
       variables: Record<string, string>;
     }
   

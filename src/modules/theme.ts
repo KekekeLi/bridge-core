@@ -1,24 +1,23 @@
 import { useElementPlusTheme } from 'use-element-plus-theme'
-import { useStorage } from '@vueuse/core'
+import { useStorage, type RemovableRef } from '@vueuse/core'
 import type { BridgeCore } from '../core/bridge'
-
 interface ThemeConfig {
   primary: string
-  secondary: string
-  variables: Record<string, string>
+  success: string
+  error: string
+  warn: string
 }
 
 export class ThemeModule {
-  private store = useStorage<ThemeConfig>('theme-config', {
-    primary: '#409EFF',
-    secondary: '#67C23A',
-    variables: {
-      '--el-color-primary': '#409EFF',
-      '--el-color-success': '#67C23A'
-    }
-  })
-
-  constructor(private bridge: BridgeCore) {
+  private store!: RemovableRef<ThemeConfig>
+  constructor(private bridge: BridgeCore, themeStoreKey: string, themeConfig?: ThemeConfig) {
+    // 初始化主题配置
+    this.store = useStorage<ThemeConfig>(themeStoreKey, themeConfig || {
+      primary: '#409EFF',
+      success: '#67C23A',
+      error: '#F56C6C',
+      warn: '#E6A23C'
+    })
     this.initElementTheme()
     this.setupHandlers()
   }
@@ -40,8 +39,9 @@ export class ThemeModule {
 
   private applyVariables() {
     const root = document.documentElement
-    Object.entries(this.store.value.variables).forEach(([key, val]) => {
-      root.style.setProperty(key, val)
+    Object.entries(this.store.value).forEach(([key, val]) => {
+      // 设置全局变量
+      root.style.setProperty(`--el-color-${key}`, val)
     })
   }
 

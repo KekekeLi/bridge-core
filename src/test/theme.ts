@@ -4,18 +4,17 @@ import type { BridgeCore } from '../core/bridge'
 
 interface ThemeConfig {
   primary: string
-  secondary: string
-  variables: Record<string, string>
+  success: string
+  error: string
+  warn: string
 }
 
 export class ThemeModule {
   private store = useStorage<ThemeConfig>('theme-config', {
     primary: '#409EFF',
-    secondary: '#67C23A',
-    variables: {
-      '--el-color-primary': '#409EFF',
-      '--el-color-success': '#67C23A'
-    }
+    success: '#67C23A',
+    error: '#F56C6C',
+    warn: '#E6A23C'
   })
 
   constructor(private bridge: BridgeCore) {
@@ -40,8 +39,9 @@ export class ThemeModule {
 
   private applyVariables() {
     const root = document.documentElement
-    Object.entries(this.store.value.variables).forEach(([key, val]) => {
-      root.style.setProperty(key, val)
+    Object.entries(this.store.value).forEach(([key, val]) => {
+      // 设置全局变量
+      root.style.setProperty(`--el-color-${key}`, val)
     })
   }
 

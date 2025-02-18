@@ -31,6 +31,7 @@ export class ThemeModule {
   private setupHandlers() {
     // 监听父应用发来的更新
     this.bridge.registerHandler('THEME_UPDATE', (payload: ThemeConfig) => {
+      console.log(payload, 'THEME_UPDATE');
       this.store.value = payload
       this.applyVariables()
       this.sendAck()
@@ -47,6 +48,7 @@ export class ThemeModule {
 
   // 主动更新方法（父应用调用）
   public updateTheme(newTheme: Partial<ThemeConfig>) {
+    console.log('newTheme', newTheme);
     // 合并更新并持久化
     this.store.value = { ...this.store.value, ...newTheme }
     // 发送给子应用

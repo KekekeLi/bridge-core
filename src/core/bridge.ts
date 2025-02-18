@@ -14,6 +14,7 @@ export class BridgeCore {
     secretKey?: string
     targetWindow?: Window
   }) {
+    console.log('init');
     this.allowedOrigins = config.allowedOrigins
     this.secretKey = config.secretKey
     this.targetWindow = config.targetWindow || window.parent
@@ -63,6 +64,7 @@ export class BridgeCore {
 
   // 安全验证
   private validateOrigin(origin: string): boolean {
+    console.log(origin, 'origin');
     return this.allowedOrigins.includes(origin);
   }
 

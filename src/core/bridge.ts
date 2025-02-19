@@ -7,16 +7,16 @@ export class BridgeCore {
   private allowedOrigins: string[]
   private secretKey?: string
   private communicator: SafeCommunicator
-  private context: HTMLIFrameElement
+  private context: HTMLIFrameElement | Window
 
   constructor(config: {
     allowedOrigins: string[]
     secretKey?: string
-    context: HTMLIFrameElement
+    context?: HTMLIFrameElement
   }) {
     this.allowedOrigins = config.allowedOrigins
     this.secretKey = config.secretKey
-    this.context = config.context
+    this.context = config.context || window.parent
     this.communicator = new SafeCommunicator(this.secretKey)
     this.initListener()
   }
@@ -69,9 +69,9 @@ export class BridgeCore {
     const message: BridgeMessage = {
       type,
       payload,
-    }
+    };
 
-    this.context?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+    (this.context as HTMLIFrameElement)?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
   }
 
   public destroy() {

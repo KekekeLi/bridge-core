@@ -6,18 +6,17 @@ export class BridgeCore {
   private modules = new Map<MessageType, MessageHandler>()
   private allowedOrigins: string[]
   private secretKey?: string
-  private targetWindow?: Window
   private communicator: SafeCommunicator
+  private context: HTMLIFrameElement
 
   constructor(config: {
     allowedOrigins: string[]
     secretKey?: string
-    targetWindow?: Window
+    context: HTMLIFrameElement
   }) {
-    console.log('init');
     this.allowedOrigins = config.allowedOrigins
     this.secretKey = config.secretKey
-    this.targetWindow = config.targetWindow || window.parent
+    this.context = config.context
     this.communicator = new SafeCommunicator(this.secretKey)
     this.initListener()
   }
@@ -39,23 +38,12 @@ export class BridgeCore {
 
   private parseMessage(data: string): BridgeMessage {
     try {
-      return this.communicator.decodeMessage(data)
+      // return this.communicator.decodeMessage(data)
+      return JSON.parse(data)
     } catch (err) {
       throw new Error('消息解析失败')
     }
   }
-  // private parseMessage(data: string): BridgeMessage {
-  //   const raw = this.encryptionKey 
-  //     ? this.decrypt(data) 
-  //     : JSON.parse(data)
-    
-  //   return {
-  //     version: raw.version || '1.0',
-  //     type: raw.type,
-  //     payload: raw.payload,
-  //     metadata: raw.metadata
-  //   }
-  // }
 
   private routeMessage(message: BridgeMessage) {
     const handler = this.modules.get(message.type)
@@ -64,7 +52,6 @@ export class BridgeCore {
 
   // 安全验证
   private validateOrigin(origin: string): boolean {
-    console.log(origin, 'origin');
     return this.allowedOrigins.includes(origin);
   }
 
@@ -78,30 +65,14 @@ export class BridgeCore {
   }
 
   // 发送信息
-  public send<T>(type: string, payload: T) {
+  public send<T>(type: string, payload: T, target?: string) {
     const message: BridgeMessage = {
       type,
       payload,
-      metadata: {
-        timestamp: Date.now(),
-        source: 'child'
-      }
     }
 
-    const data = this.communicator.encodeMessage(message)
-
-    this.targetWindow?.postMessage(data, '*')
+    this.context?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
   }
-  // send(target: Window, type: string, payload: any) {
-  //   target.postMessage(JSON.stringify({
-  //     type,
-  //     payload,
-  //     metadata: {
-  //       timestamp: Date.now(),
-  //       source: 'child'
-  //     }
-  //   }), '*');
-  // }
 
   public destroy() {
     window.removeEventListener('message', this.handleMessage)

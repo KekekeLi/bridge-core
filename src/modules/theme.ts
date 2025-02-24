@@ -5,7 +5,7 @@ interface ThemeConfig {
   primary: string
   success: string
   error: string
-  warn: string
+  warning: string
 }
 
 export class ThemeModule {
@@ -16,7 +16,7 @@ export class ThemeModule {
       primary: '#409EFF',
       success: '#67C23A',
       error: '#F56C6C',
-      warn: '#E6A23C'
+      warning: '#E6A23C'
     })
 
     this.initElementTheme()

@@ -14,3 +14,5 @@ export interface BridgeMessage<T = unknown> {
     signature?: string // 安全签名（用于验证）
   }
 }
+
+export type SourceType = 'container' | 'subApp'

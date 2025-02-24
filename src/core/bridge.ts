@@ -1,4 +1,4 @@
-import { BridgeMessage, MessageType } from '../types/protocol'
+import { BridgeMessage, MessageType, SourceType } from '../types/protocol'
 import { SafeCommunicator } from './communicator'
 type MessageHandler<T = any> = (payload: T) => void
 
@@ -8,15 +8,18 @@ export class BridgeCore {
   private secretKey?: string
   private communicator: SafeCommunicator
   private context: HTMLIFrameElement | Window
+  private source?: SourceType
 
   constructor(config: {
     allowedOrigins: string[]
     secretKey?: string
     context?: HTMLIFrameElement
+    source?: SourceType
   }) {
     this.allowedOrigins = config.allowedOrigins
     this.secretKey = config.secretKey
     this.context = config.context || window.parent
+    this.source = config.source
     this.communicator = new SafeCommunicator(this.secretKey)
     this.initListener()
   }
@@ -71,7 +74,13 @@ export class BridgeCore {
       payload,
     };
 
-    (this.context as HTMLIFrameElement)?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+    if (this.source === 'container') {
+      // 父传子
+      (this.context as HTMLIFrameElement)?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+    } else if(this.source === 'subApp') {
+      // 子传父
+      window.parent.postMessage(JSON.stringify(message), target || '*')
+    }
   }
 
   public destroy() {

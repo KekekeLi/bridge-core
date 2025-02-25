@@ -94,4 +94,12 @@ export class BridgeCore {
   generateMessageNonce(): string {
     return this.communicator.generateMessageNonce()
   }
+
+  public addAllowedOrigin(origin: string) {
+    this.allowedOrigins.push(origin)
+  }
+
+  public clearAllowedOrigins() {
+    this.allowedOrigins = []
+  }
 }

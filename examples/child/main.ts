@@ -8,7 +8,7 @@ const bridge = new BridgeCore({
 })
 
 // 初始化模块
-new ThemeModule(bridge)
+new ThemeModule(bridge, 'theme-config')
 new FontModule(bridge)
 
 const handleCustomAction = (data: any) => {

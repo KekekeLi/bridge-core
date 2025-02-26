@@ -2,23 +2,26 @@
 <script setup>
 import { BridgeCore, ThemeModule, FontModule } from 'bridge-core'
 
-// const bridge = useBridge()
-// const theme = ref('#409EFF')
+// 初始化通信中心
+let themeModule = null, fontModule = null
+const iframePage = ref(null)
+const config = localStorage.getItem(THEME_CONFIG_KEY)
+onMounted(() => {
+  const iframe = iframePage.value
+  iframe.onload = () => {
 
-// const updateTheme = (color) => {
-//   bridge.theme.updatePrimary(color)
-// }
-// 初始化
-const bridge = new BridgeCore({
-  allowedOrigins: ['https://child-domain.com'],
-  secretKey: 'your-secret-key'
+    const bridge = new BridgeCore({
+      allowedOrigins: [url.value],
+      secretKey: '123',
+      context: iframe,
+      source: 'container'
+    })
+    themeModule = new ThemeModule(bridgeStore.bridge, THEME_CONFIG_KEY)
+    fontModule = new FontModule(bridgeStore.bridge)
+    // 确保发送到 iframe 的实际源
+    themeModule.updateTheme(JSON.parse(config), url.value)
+  }
 })
-
-const themeModule = new ThemeModule(bridge)
-const fontModule = new FontModule(bridge)
-
-// 更新主题示例
-themeModule.updatePrimary('#FF0000')
 
 // 更新字体示例
 fontModule.setScale(1.2)

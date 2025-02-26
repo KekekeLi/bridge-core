@@ -30,13 +30,18 @@ source：消息的发送源类型。
 
 构造函数：
 
-Apply
-constructor(config: {
-  allowedOrigins: string[]
-  secretKey?: string
-  context?: HTMLIFrameElement
-  source?: SourceType
-})
+
+```
+Apply constructor(
+  config: {
+    allowedOrigins: string[]
+    secretKey?: string
+    context?: HTMLIFrameElement
+    source?: SourceType
+  }
+)
+```
+
 
 初始化 BridgeCore 实例，设置允许的域名、密钥、上下文和源类型，并初始化消息监听器。
 
@@ -69,29 +74,51 @@ addAllowedOrigin(origin: string)：添加允许的消息来源域名。
 使用示例
 
 typescript
+
 Apply
-import { BridgeCore, MessageType, SourceType } from './bridge'
+
 
 // 创建 BridgeCore 实例
+
+```
+import { BridgeCore, MessageType, SourceType } from './bridge'
+
 const bridge = new BridgeCore({
   allowedOrigins: ['https://example.com'],
   secretKey: 'your-secret-key',
   context: document.getElementById('my-iframe') as HTMLIFrameElement,
   source: SourceType.container
 })
+```
+
 
 // 注册消息处理程序
+
+```
 bridge.registerHandler(MessageType.MyMessage, (payload) => {
   console.log('Received message:', payload)
 })
+```
+
 
 // 发送消息
+
+```
+
 bridge.send(MessageType.MyMessage, { data: 'Hello, World!' }, 'https://example.com')
+```
+
 
 // 销毁 BridgeCore 实例
+
+
+```
 bridge.destroy()
+```
+
 
 注意事项
+
 确保在使用 BridgeCore 时，正确设置允许的域名列表，以防止跨站脚本攻击（XSS）。
 
 如果使用了密钥，确保密钥的安全性，避免泄露。

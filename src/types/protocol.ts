@@ -15,4 +15,10 @@ export interface BridgeMessage<T = unknown> {
   }
 }
 
-export type SourceType = 'container' | 'subApp'
+export type SourceType = 'container' | 'subApp' | 'tab'
+
+export type ContextType = 'iframe' | 'tab'
+
+export interface PostMessageFn {
+  (message: string, targetOrigin?: string, transfer?: Transferable[]): void
+}

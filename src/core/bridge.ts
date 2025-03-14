@@ -1,24 +1,35 @@
-import { BridgeMessage, MessageType, SourceType } from '../types/protocol'
+import { BridgeMessage, MessageType, SourceType, ContextType, PostMessageFn } from '../types/protocol'
 import { SafeCommunicator } from './communicator'
 type MessageHandler<T = any> = (payload: T) => void
 
 export class BridgeCore {
+  // 模块，支持注册事件
   private modules = new Map<MessageType, MessageHandler>()
+  // 可接收的信息源
   private allowedOrigins: string[]
+  // 密钥，用于消息加密
   private secretKey?: string
+  // 加/解密工具
   private communicator: SafeCommunicator
-  private context: HTMLIFrameElement | Window
+  // iframe或window的postMessage通信上下文
+  private iframeContext?: HTMLIFrameElement[] | Window
+  // 新tab页的postMessage通信上下文
+  private tabContext?: Map<string, PostMessageFn> | null
+  // 消息源
   private source?: SourceType
 
   constructor(config: {
     allowedOrigins: string[]
     secretKey?: string
     context?: HTMLIFrameElement
+    iframeContext?: HTMLIFrameElement[]
+    tabContext?: Map<string, PostMessageFn> | null
     source?: SourceType
   }) {
     this.allowedOrigins = config.allowedOrigins
     this.secretKey = config.secretKey
-    this.context = config.context || window.parent
+    this.iframeContext = config.iframeContext
+    this.tabContext = config.tabContext 
     this.source = config.source
     this.communicator = new SafeCommunicator(this.secretKey)
     this.initListener()
@@ -26,6 +37,10 @@ export class BridgeCore {
 
   private initListener() {
     window.addEventListener('message', this.handleMessage)
+  }
+
+  public getOrigins() {
+    return this.allowedOrigins
   }
 
   private handleMessage = (event: MessageEvent) => {
@@ -75,11 +90,25 @@ export class BridgeCore {
     };
 
     if (this.source === 'container') {
-      // 父传子
-      (this.context as HTMLIFrameElement)?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+      // 父传子：iframe
+      // (this.context as HTMLIFrameElement)?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+      (this.iframeContext as HTMLIFrameElement[])?.forEach((iframe) => {
+        iframe?.contentWindow?.postMessage(JSON.stringify(message), target || '*')
+      })
+      // 父传子：新tab页
+      if (this.tabContext) {
+        this.tabContext.forEach((fn: PostMessageFn, key) => {
+          fn(JSON.stringify(message), key)
+        })
+      }
     } else if(this.source === 'subApp') {
-      // 子传父
-      window.parent.postMessage(JSON.stringify(message), target || '*')
+      if (window.opener) {
+        // 子传父
+        window.opener?.postMessage(JSON.stringify(message), this.allowedOrigins[0])
+      } else {
+        // 子传父
+        window.parent.postMessage(JSON.stringify(message), this.allowedOrigins[0])
+      }
     }
   }
 
@@ -101,5 +130,13 @@ export class BridgeCore {
 
   public clearAllowedOrigins() {
     this.allowedOrigins = []
+  }
+
+  public updateContext(context: HTMLIFrameElement[] | Map<string, PostMessageFn>, type: ContextType) {
+    if (type === 'iframe') {
+      this.iframeContext = context as HTMLIFrameElement[]
+    } else if (type === 'tab') {
+      this.tabContext = context as Map<string, PostMessageFn>
+    }
   }
 }
